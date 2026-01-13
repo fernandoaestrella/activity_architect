@@ -1,0 +1,243 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { Settings2, Zap, Sparkles, Search, Info, Sliders, ChevronRight, AlertCircle } from 'lucide-react';
+
+// The dataset based on your taxonomy values
+const ACTIVITY_DATA = [
+  { name: "Minecraft (Creative)", physiological: 2.0, actualization: 9.5, chakra: 8.0, objective: 2.0, interactivity: 9.0, speed: 5.0, spatial: 10.0, discovery: 9.0, response: 4.0, challenge: 5.0, personalization: 10.0, avatar: 9.0, curve: 4.0, random: 7.0 },
+  { name: "The Sims 4", physiological: 1.0, actualization: 6.0, chakra: 4.0, objective: 3.0, interactivity: 8.5, speed: 4.0, spatial: 5.0, discovery: 7.0, response: 5.0, challenge: 3.0, personalization: 9.0, avatar: 10.0, curve: 3.0, random: 5.0 },
+  { name: "Elden Ring", physiological: 1.0, actualization: 7.0, chakra: 3.0, objective: 9.0, interactivity: 9.5, speed: 9.5, spatial: 8.0, discovery: 9.5, response: 9.5, challenge: 9.5, personalization: 6.0, avatar: 9.0, curve: 9.0, random: 2.0 },
+  { name: "Stardew Valley", physiological: 2.0, actualization: 7.0, chakra: 8.5, objective: 6.0, interactivity: 8.0, speed: 4.0, spatial: 4.0, discovery: 8.0, response: 6.0, challenge: 4.0, personalization: 7.5, avatar: 8.0, curve: 3.5, random: 4.0 },
+  { name: "Tetris", physiological: 1.0, actualization: 3.0, chakra: 2.0, objective: 10.0, interactivity: 9.0, speed: 9.5, spatial: 1.0, discovery: 2.0, response: 8.0, challenge: 10.0, personalization: 1.0, avatar: 2.0, curve: 2.0, random: 8.0 },
+  { name: "Chess", physiological: 1.0, actualization: 8.0, chakra: 5.0, objective: 10.0, interactivity: 8.0, speed: 3.0, spatial: 2.0, discovery: 9.0, response: 7.0, challenge: 10.0, personalization: 2.0, avatar: 1.0, curve: 9.5, random: 0.0 },
+  { name: "League of Legends", physiological: 1.0, actualization: 4.0, chakra: 1.0, objective: 9.0, interactivity: 9.5, speed: 9.8, spatial: 3.0, discovery: 6.0, response: 9.8, challenge: 9.0, personalization: 4.0, avatar: 8.5, curve: 9.8, random: 3.0 },
+  { name: "Candy Crush", physiological: 1.0, actualization: 1.0, chakra: 1.0, objective: 10.0, interactivity: 7.0, speed: 8.0, spatial: 1.0, discovery: 3.0, response: 7.5, challenge: 6.0, personalization: 1.0, avatar: 0.0, curve: 1.5, random: 7.0 },
+  { name: "Civilization VI", physiological: 1.0, actualization: 8.5, chakra: 4.0, objective: 9.0, interactivity: 7.0, speed: 2.0, spatial: 10.0, discovery: 9.0, response: 6.0, challenge: 8.0, personalization: 6.0, avatar: 1.0, curve: 8.5, random: 6.5 },
+  { name: "Deep Meditation", physiological: 5.0, actualization: 10.0, chakra: 10.0, objective: 1.0, interactivity: 2.0, speed: 0.5, spatial: 1.0, discovery: 9.5, response: 2.0, challenge: 7.0, personalization: 10.0, avatar: 10.0, curve: 8.0, random: 1.0 },
+  { name: "Walking in Nature", physiological: 6.0, actualization: 8.0, chakra: 9.0, objective: 2.0, interactivity: 4.0, speed: 3.0, spatial: 10.0, discovery: 8.5, response: 4.5, challenge: 2.0, personalization: 5.0, avatar: 10.0, curve: 1.0, random: 6.0 },
+  { name: "Cooking (New Recipe)", physiological: 8.0, actualization: 7.5, chakra: 6.0, objective: 8.5, interactivity: 9.0, speed: 6.0, spatial: 3.0, discovery: 7.0, response: 8.5, challenge: 7.0, personalization: 8.0, avatar: 10.0, curve: 6.0, random: 4.0 },
+  { name: "Soccer (Football)", physiological: 9.0, actualization: 7.0, chakra: 5.0, objective: 10.0, interactivity: 9.8, speed: 9.5, spatial: 10.0, discovery: 6.0, response: 9.5, challenge: 8.5, personalization: 4.0, avatar: 10.0, curve: 7.0, random: 5.0 },
+  { name: "Oil Painting", physiological: 2.0, actualization: 9.8, chakra: 9.0, objective: 2.0, interactivity: 9.0, speed: 4.0, spatial: 3.0, discovery: 9.0, response: 7.0, challenge: 8.0, personalization: 10.0, avatar: 10.0, curve: 8.5, random: 2.0 },
+  { name: "HIIT Workout", physiological: 10.0, actualization: 6.0, chakra: 4.0, objective: 9.0, interactivity: 3.0, speed: 9.0, spatial: 2.0, discovery: 1.0, response: 10.0, challenge: 9.0, personalization: 1.0, avatar: 10.0, curve: 3.0, random: 1.0 },
+  { name: "Socializing (Party)", physiological: 1.0, actualization: 5.0, chakra: 7.0, objective: 2.0, interactivity: 9.5, speed: 7.0, spatial: 6.0, discovery: 9.0, response: 8.5, challenge: 6.0, personalization: 9.0, avatar: 10.0, curve: 5.0, random: 9.0 },
+  { name: "Monopoly", physiological: 1.0, actualization: 2.0, chakra: 2.0, objective: 10.0, interactivity: 7.0, speed: 3.0, spatial: 2.0, discovery: 3.0, response: 7.0, challenge: 5.0, personalization: 2.0, avatar: 1.0, curve: 2.0, random: 10.0 },
+  { name: "Portal 2", physiological: 1.0, actualization: 8.0, chakra: 4.0, objective: 10.0, interactivity: 9.0, speed: 6.0, spatial: 6.0, discovery: 9.0, response: 8.0, challenge: 9.0, personalization: 2.0, avatar: 8.5, curve: 7.5, random: 0.0 },
+  { name: "Call of Duty", physiological: 1.0, actualization: 3.0, chakra: 1.0, objective: 10.0, interactivity: 9.7, speed: 9.9, spatial: 6.0, discovery: 5.0, response: 9.9, challenge: 8.5, personalization: 6.0, avatar: 9.0, curve: 7.5, random: 4.0 },
+  { name: "It Takes Two", physiological: 1.0, actualization: 7.0, chakra: 8.0, objective: 10.0, interactivity: 9.5, speed: 8.0, spatial: 7.0, discovery: 9.5, response: 8.5, challenge: 7.5, personalization: 3.0, avatar: 9.0, curve: 5.0, random: 2.0 },
+  { name: "Hot Showering", physiological: 9.5, actualization: 3.0, chakra: 8.5, objective: 1.0, interactivity: 2.0, speed: 3.0, spatial: 1.0, discovery: 1.0, response: 6.0, challenge: 1.0, personalization: 2.0, avatar: 10.0, curve: 0.5, random: 1.0 },
+  { name: "Commute Driving", physiological: 2.0, actualization: 1.0, chakra: 2.0, objective: 8.0, interactivity: 6.0, speed: 7.5, spatial: 10.0, discovery: 4.0, response: 5.0, challenge: 5.0, personalization: 2.0, avatar: 10.0, curve: 4.0, random: 6.0 },
+  { name: "Lucid Dreaming", physiological: 3.0, actualization: 10.0, chakra: 10.0, objective: 4.0, interactivity: 8.0, speed: 5.0, spatial: 0.0, discovery: 10.0, response: 9.0, challenge: 9.5, personalization: 10.0, avatar: 10.0, curve: 9.8, random: 9.0 },
+  { name: "Academic Studying", physiological: 1.0, actualization: 8.5, chakra: 5.0, objective: 7.0, interactivity: 4.0, speed: 2.0, spatial: 1.0, discovery: 9.5, response: 3.0, challenge: 8.5, personalization: 4.0, avatar: 10.0, curve: 9.0, random: 1.0 },
+  { name: "Gardening", physiological: 6.0, actualization: 8.5, chakra: 9.5, objective: 5.0, interactivity: 8.0, speed: 2.0, spatial: 5.0, discovery: 8.0, response: 5.0, challenge: 4.0, personalization: 8.5, avatar: 10.0, curve: 5.0, random: 4.0 },
+  { name: "Journaling", physiological: 2.0, actualization: 9.5, chakra: 10.0, objective: 2.0, interactivity: 6.0, speed: 3.0, spatial: 1.0, discovery: 9.5, response: 6.0, challenge: 6.0, personalization: 10.0, avatar: 10.0, curve: 3.0, random: 1.0 },
+  { name: "Rocket League", physiological: 1.0, actualization: 5.0, chakra: 3.0, objective: 10.0, interactivity: 9.8, speed: 10.0, spatial: 4.0, discovery: 5.0, response: 9.5, challenge: 10.0, personalization: 6.0, avatar: 9.0, curve: 9.9, random: 2.0 },
+  { name: "Animal Crossing", physiological: 2.0, actualization: 6.0, chakra: 9.0, objective: 4.0, interactivity: 8.0, speed: 3.0, spatial: 5.0, discovery: 7.5, response: 4.0, challenge: 2.0, personalization: 9.5, avatar: 8.5, curve: 2.0, random: 5.0 },
+  { name: "Super Mario Odyssey", physiological: 1.0, actualization: 7.0, chakra: 6.0, objective: 9.0, interactivity: 9.5, speed: 8.5, spatial: 8.0, discovery: 9.8, response: 8.5, challenge: 7.0, personalization: 5.0, avatar: 9.5, curve: 4.0, random: 3.0 },
+  { name: "Solo Dancing", physiological: 8.0, actualization: 9.0, chakra: 9.0, objective: 1.0, interactivity: 9.0, speed: 8.5, spatial: 4.0, discovery: 7.0, response: 9.0, challenge: 6.0, personalization: 10.0, avatar: 10.0, curve: 5.0, random: 3.0 }
+];
+
+const DIMENSIONS = [
+  { key: 'physiological', label: 'Physiological Need', description: 'Supply of bodily/physical needs' },
+  { key: 'actualization', label: 'Self-Actualization', description: 'Growth, meaning, and transcendence' },
+  { key: 'chakra', label: 'Chakra Balance', description: 'Internal emotional alignment' },
+  { key: 'objective', label: 'Objective Clarity', description: 'How well defined the goals are' },
+  { key: 'interactivity', label: 'Interactivity', description: 'Impact of your acts on next steps' },
+  { key: 'speed', label: 'Time Quantum (Speed)', description: 'Length of steps relative to time' },
+  { key: 'spatial', label: 'Spatial Needs', description: 'Requirement of physical/simulated space' },
+  { key: 'discovery', label: 'Discovery Amount', description: 'Potential to find new aspects' },
+  { key: 'response', label: 'Response Intensity', description: 'Force of the activity\'s feedback' },
+  { key: 'challenge', label: 'Challenge Alignment', description: 'Abilities vs requirements match' },
+  { key: 'personalization', label: 'Personalization Depth', description: 'Ability to express your core self' },
+  { key: 'avatar', label: 'Avatar Agency', description: 'Control over self-representation' },
+  { key: 'random', label: 'Randomicity', description: 'Prevalence of unpredictable elements' }
+];
+
+const App = () => {
+  const [filters, setFilters] = useState(
+    DIMENSIONS.reduce((acc, dim) => ({ ...acc, [dim.key]: 0 }), {})
+  );
+  const [tolerance, setTolerance] = useState(2.0);
+  const [activeDimension, setActiveDimension] = useState(null);
+
+  const filteredActivities = useMemo(() => {
+    // Return all if no filters are significantly engaged (above 0.5)
+    const activeFilters = Object.entries(filters).filter(([_, v]) => v > 0);
+    if (activeFilters.length === 0) return ACTIVITY_DATA;
+
+    return ACTIVITY_DATA.filter(activity => {
+      return activeFilters.every(([key, value]) => {
+        const diff = Math.abs(activity[key] - value);
+        return diff <= tolerance;
+      });
+    });
+  }, [filters, tolerance]);
+
+  const handleSliderChange = (key, val) => {
+    setFilters(prev => ({ ...prev, [key]: parseFloat(val) }));
+  };
+
+  const resetFilters = () => {
+    setFilters(DIMENSIONS.reduce((acc, dim) => ({ ...acc, [dim.key]: 0 }), {}));
+  };
+
+  return (
+    <div className="flex flex-col h-screen bg-slate-950 text-slate-100 font-sans overflow-hidden">
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md">
+        <div className="flex items-center gap-2">
+          <div className="p-2 bg-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
+            <Sliders className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-lg font-bold tracking-tight">Activity Architect</h1>
+            <p className="text-xs text-slate-400 uppercase tracking-widest font-medium">Taxonomy Calibration Engine</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+            <div className="flex flex-col items-end mr-4">
+                <span className="text-[10px] text-slate-500 uppercase font-bold">Precision Threshold</span>
+                <input 
+                    type="range" 
+                    min="0.5" 
+                    max="5" 
+                    step="0.1" 
+                    value={tolerance}
+                    onChange={(e) => setTolerance(parseFloat(e.target.value))}
+                    className="w-32 accent-indigo-500"
+                />
+            </div>
+            <button 
+                onClick={resetFilters}
+                className="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 rounded-full transition-colors border border-slate-700"
+            >
+                Clear Console
+            </button>
+        </div>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar: The Mixing Console */}
+        <aside className="w-80 bg-slate-900 border-r border-slate-800 overflow-y-auto custom-scrollbar p-6">
+          <div className="flex items-center gap-2 mb-6 text-slate-400">
+            <Settings2 className="w-4 h-4" />
+            <h2 className="text-xs font-bold uppercase tracking-wider">Dimension Mixer</h2>
+          </div>
+
+          <div className="space-y-8">
+            {DIMENSIONS.map((dim) => (
+              <div 
+                key={dim.key} 
+                className="group relative"
+                onMouseEnter={() => setActiveDimension(dim)}
+                onMouseLeave={() => setActiveDimension(null)}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-semibold text-slate-300 group-hover:text-indigo-400 transition-colors">
+                    {dim.label}
+                  </label>
+                  <span className="text-xs font-mono py-1 px-2 bg-slate-800 rounded text-indigo-400 border border-slate-700">
+                    {filters[dim.key].toFixed(1)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={filters[dim.key]}
+                  onChange={(e) => handleSliderChange(dim.key, e.target.value)}
+                  className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:accent-indigo-400 transition-all"
+                />
+              </div>
+            ))}
+          </div>
+        </aside>
+
+        {/* Main View: The Matching Engine */}
+        <main className="flex-1 flex flex-col bg-slate-950 p-8 overflow-y-auto">
+          
+          {/* Active Tooltip / Meta-Instruction */}
+          <div className="h-20 mb-8 border-l-2 border-indigo-500 pl-4 py-1 flex flex-col justify-center">
+             {activeDimension ? (
+               <>
+                 <h3 className="text-indigo-400 font-bold text-sm uppercase tracking-wider mb-1">{activeDimension.label}</h3>
+                 <p className="text-slate-400 text-sm max-w-2xl italic leading-relaxed">
+                   {activeDimension.description}
+                 </p>
+               </>
+             ) : (
+               <>
+                 <h3 className="text-slate-500 font-bold text-sm uppercase tracking-wider mb-1">Architecture Mode</h3>
+                 <p className="text-slate-500 text-sm italic">
+                   Adjust the sliders to define your precise minute requirements for reality...
+                 </p>
+               </>
+             )}
+          </div>
+
+          {/* Results Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredActivities.length > 0 ? (
+              filteredActivities.map((activity) => (
+                <div 
+                  key={activity.name} 
+                  className="group p-5 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-900/60 transition-all duration-300 shadow-sm hover:shadow-indigo-500/10"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="font-bold text-slate-100 group-hover:text-white transition-colors">{activity.name}</h3>
+                    <div className="flex items-center gap-1 text-[10px] text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded-full border border-indigo-500/20">
+                      <Sparkles className="w-3 h-3" />
+                      <span>MATCHED</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {/* Tiny visualizers for key dimensions */}
+                    <div className="flex flex-wrap gap-2">
+                        {['actualization', 'chakra', 'interactivity', 'speed'].map(key => (
+                            <div key={key} className="flex-1 min-w-[60px] bg-slate-950/50 p-2 rounded-lg border border-slate-800">
+                                <span className="block text-[8px] uppercase text-slate-500 font-bold truncate">{key}</span>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+                                        <div 
+                                            className="h-full bg-indigo-500" 
+                                            style={{ width: `${activity[key] * 10}%` }}
+                                        />
+                                    </div>
+                                    <span className="text-[10px] font-mono text-slate-300">{activity[key].toFixed(1)}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                  </div>
+                  
+                  <button className="w-full mt-4 py-2 text-xs font-bold text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 rounded-xl flex items-center justify-center gap-2 transition-all">
+                    View Complete Taxonomy <ChevronRight className="w-3 h-3" />
+                  </button>
+                </div>
+              ))
+            ) : (
+              /* The INNOVATION ZONE alert */
+              <div className="col-span-full py-20 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500">
+                <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 border border-amber-500/20 shadow-2xl shadow-amber-500/10">
+                  <AlertCircle className="w-10 h-10 text-amber-500" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-100 mb-2 italic">Entrance: The Innovation Zone</h2>
+                <p className="text-slate-400 max-w-md mx-auto mb-8 leading-relaxed">
+                   You have constructed a minute requirement for which <span className="text-amber-500 font-bold underline">no existing activity</span> is currently calibrated.
+                </p>
+                <div className="bg-slate-900 border border-amber-500/30 p-6 rounded-3xl max-w-lg shadow-xl shadow-amber-500/5">
+                   <p className="text-sm text-amber-200/80 mb-4 font-medium italic">"Notice you can find your fun anywhere, and it is a deeper, more reliable source of stability. You can create your own game inside a game."</p>
+                   <button className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-full font-bold text-sm transition-all shadow-lg shadow-amber-600/20 active:scale-95">
+                      Draft a New Activity for this State
+                   </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default App;
