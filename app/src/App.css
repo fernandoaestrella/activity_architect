@@ -739,9 +739,30 @@ body {
   margin-bottom: 1rem;
 }
 
+.about-fork {
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.about-fork h3 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.about-fork p {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+
 .github-link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, #24292e, #404448);
@@ -752,6 +773,14 @@ body {
   font-size: 0.875rem;
   transition: all var(--transition-fast);
   box-shadow: 0 4px 15px rgba(36, 41, 46, 0.4);
+  max-width: 100%;
+  text-align: center;
+}
+
+.github-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .github-link:hover {
@@ -1343,4 +1372,79 @@ body {
 
 .taxonomy-item.edited:hover {
   border-color: rgba(250, 204, 21, 0.5);
+}
+
+/* ========================================
+   Loading Screen
+   ======================================== */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  color: var(--color-accent);
+  animation: spin 1s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to right, var(--color-text-primary), var(--color-accent-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.loading-content p {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.loading-screen.error .loading-content h2 {
+  color: #f87171;
+  background: none;
+  -webkit-text-fill-color: #f87171;
+}
+
+.loading-screen.error .loading-content p {
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.retry-btn {
+  padding: 0.75rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.retry-btn:hover {
+  background: var(--color-accent-light);
+  transform: scale(1.02);
 }

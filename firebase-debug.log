@@ -1,0 +1,25 @@
+[debug] [2026-01-13T18:32:24.514Z] ----------------------------------------------------------------------
+[debug] [2026-01-13T18:32:24.522Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Admin\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2026-01-13T18:32:24.523Z] CLI Version:   15.1.0
+[debug] [2026-01-13T18:32:24.524Z] Platform:      win32
+[debug] [2026-01-13T18:32:24.524Z] Node Version:  v22.7.0
+[debug] [2026-01-13T18:32:24.525Z] Time:          Tue Jan 13 2026 14:32:24 GMT-0400 (Bolivia Time)
+[debug] [2026-01-13T18:32:24.526Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-01-13T18:32:24.538Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-01-13T18:32:24.862Z] Error: ENOENT: no such file or directory, lstat 'C:\Users\Admin\AppData\Roaming\npm\node_modules\firebase-tools\lib\functions'
+    at Object.realpathSync (node:fs:2705:29)
+    at toRealPath (node:internal/modules/helpers:53:13)
+    at tryFile (node:internal/modules/cjs/loader:526:10)
+    at tryExtensions (node:internal/modules/cjs/loader:537:22)
+    at Module._findPath (node:internal/modules/cjs/loader:785:20)
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1234:27)
+    at Module._load (node:internal/modules/cjs/loader:1074:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:315:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:217:24)
+    at Module.require (node:internal/modules/cjs/loader:1339:12)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2026-01-13T18:32:25.083Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-01-13T18:32:25.083Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-01-13T18:32:25.162Z] Error when notifying about new CLI updates:

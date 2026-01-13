@@ -1,7 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Settings2, Sliders, ChevronRight, AlertCircle, User, X, Github, Plus, Save, RotateCcw } from 'lucide-react';
-import { DIMENSIONS } from './data/dimensions';
-import defaultActivityData from './data/activities.json';
+import { Settings2, Sliders, ChevronRight, User, Plus, RotateCcw } from 'lucide-react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './firebase/config';
+import { 
+  AboutModal, 
+  AddActivityModal, 
+  TaxonomyModal, 
+  InnovationZone, 
+  LoadingScreen 
+} from './components';
 import './App.css';
 
 // LocalStorage keys
@@ -39,9 +46,13 @@ const saveTaxonomyEdits = (edits) => {
 };
 
 const App = () => {
-  const [filters, setFilters] = useState(
-    DIMENSIONS.reduce((acc, dim) => ({ ...acc, [dim.key]: 0 }), {})
-  );
+  // Data loading state
+  const [dimensions, setDimensions] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+
+  const [filters, setFilters] = useState({});
   const [tolerance, setTolerance] = useState(2.0);
   const [activeDimension, setActiveDimension] = useState(null);
   const [showAbout, setShowAbout] = useState(false);
@@ -49,16 +60,51 @@ const App = () => {
   const [showAddActivity, setShowAddActivity] = useState(false);
   const [customActivities, setCustomActivities] = useState([]);
   const [newActivityName, setNewActivityName] = useState('');
-  const [newActivityDimensions, setNewActivityDimensions] = useState(
-    DIMENSIONS.reduce((acc, dim) => ({ ...acc, [dim.key]: 5 }), {})
-  );
+  const [newActivityDimensions, setNewActivityDimensions] = useState({});
   // Taxonomy edits: { activityName: { dimensionKey: value } }
   const [taxonomyEdits, setTaxonomyEdits] = useState({});
 
-  // Load custom activities and taxonomy edits on mount
+  // Fetch data from Firestore on mount
   useEffect(() => {
-    setCustomActivities(loadCustomActivities());
-    setTaxonomyEdits(loadTaxonomyEdits());
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Fetch dimensions
+        const dimensionsSnapshot = await getDocs(collection(db, 'dimensions'));
+        const dimensionsData = dimensionsSnapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+        
+        // Fetch activities
+        const activitiesSnapshot = await getDocs(collection(db, 'activities'));
+        const activitiesData = activitiesSnapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        setDimensions(dimensionsData);
+        setActivities(activitiesData);
+        
+        // Initialize filters based on loaded dimensions
+        const initialFilters = dimensionsData.reduce((acc, dim) => ({ ...acc, [dim.key]: 0 }), {});
+        setFilters(initialFilters);
+        
+        // Initialize new activity dimensions
+        const initialNewDims = dimensionsData.reduce((acc, dim) => ({ ...acc, [dim.key]: 5 }), {});
+        setNewActivityDimensions(initialNewDims);
+        
+        // Load custom activities and taxonomy edits
+        setCustomActivities(loadCustomActivities());
+        setTaxonomyEdits(loadTaxonomyEdits());
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoadError(error.message);
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
   }, []);
 
   // Helper to get activity value with edits applied
@@ -66,7 +112,7 @@ const App = () => {
     if (taxonomyEdits[activity.name] && taxonomyEdits[activity.name][dimKey] !== undefined) {
       return taxonomyEdits[activity.name][dimKey];
     }
-    return activity[dimKey];
+    return activity[dimKey] ?? 5; // Default to 5 if dimension not found
   };
 
   // Check if there are any edits
@@ -74,8 +120,8 @@ const App = () => {
 
   // Combine default and custom activities
   const allActivities = useMemo(() => {
-    return [...defaultActivityData, ...customActivities];
-  }, [customActivities]);
+    return [...activities, ...customActivities];
+  }, [activities, customActivities]);
 
   // Get only the dimensions that have active filters (value > 0)
   const activeDimensionKeys = useMemo(() => {
@@ -103,7 +149,7 @@ const App = () => {
   };
 
   const resetFilters = () => {
-    setFilters(DIMENSIONS.reduce((acc, dim) => ({ ...acc, [dim.key]: 0 }), {}));
+    setFilters(dimensions.reduce((acc, dim) => ({ ...acc, [dim.key]: 0 }), {}));
   };
 
   // Handle taxonomy edit
@@ -136,7 +182,7 @@ const App = () => {
   // Open Add Activity modal with current filters as defaults
   const openAddActivityModal = () => {
     // Pre-populate dimensions with current filter values (or 5 if not filtered)
-    const initialDimensions = DIMENSIONS.reduce((acc, dim) => ({
+    const initialDimensions = dimensions.reduce((acc, dim) => ({
       ...acc,
       [dim.key]: filters[dim.key] > 0 ? filters[dim.key] : 5
     }), {});
@@ -168,224 +214,43 @@ const App = () => {
     setNewActivityName('');
   };
 
+  // Show loading screen while data is being fetched
+  if (isLoading || loadError) {
+    return <LoadingScreen error={loadError} />;
+  }
+
   return (
     <div className="app-container">
       {/* About Modal */}
       {showAbout && (
-        <div className="modal-overlay" onClick={() => setShowAbout(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowAbout(false)}>
-              <X className="icon-small" />
-            </button>
-            <div className="about-content">
-              <h2 className="about-title">About Activity Architect</h2>
-              <p className="about-description">
-                A taxonomy calibration engine for discovering and architecting activities
-                based on multi-dimensional requirements.
-              </p>
-              <div className="about-author">
-                <h3>Created by</h3>
-                <a 
-                  href="https://github.com/fernandoaestrella" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="github-link"
-                >
-                  <Github className="icon-small" />
-                  <span>Fernando A. Estrella</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AboutModal onClose={() => setShowAbout(false)} />
       )}
 
       {/* Add Activity Modal */}
       {showAddActivity && (
-        <div className="modal-overlay" onClick={() => setShowAddActivity(false)}>
-          <div className="add-activity-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowAddActivity(false)}>
-              <X className="icon-small" />
-            </button>
-            <div className="add-activity-header">
-              <h2 className="add-activity-title">Create New Activity</h2>
-              <p className="add-activity-subtitle">Define the dimensional profile for your activity</p>
-            </div>
-
-            <div className="add-activity-form">
-              <div className="form-field">
-                <label className="form-label">Activity Name</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter activity name..."
-                  value={newActivityName}
-                  onChange={(e) => setNewActivityName(e.target.value)}
-                  autoFocus
-                />
-              </div>
-
-              <div className="form-dimensions">
-                <h3 className="form-dimensions-title">Dimensional Values</h3>
-                <div className="form-dimensions-list">
-                  {DIMENSIONS.map(dim => (
-                    <div key={dim.key} className="form-dimension-item">
-                      <div className="form-dimension-header">
-                        <label className="form-dimension-label">{dim.label}</label>
-                        <span className="form-dimension-value">
-                          {newActivityDimensions[dim.key].toFixed(1)}
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        step="0.1"
-                        value={newActivityDimensions[dim.key]}
-                        onChange={(e) => handleNewActivityDimensionChange(dim.key, e.target.value)}
-                        className="form-dimension-slider"
-                      />
-                      <p className="form-dimension-desc">{dim.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <button 
-                className="save-activity-btn"
-                onClick={handleSaveActivity}
-                disabled={!newActivityName.trim()}
-              >
-                <Save className="icon-tiny" />
-                Save Activity
-              </button>
-            </div>
-          </div>
-        </div>
+        <AddActivityModal
+          onClose={() => setShowAddActivity(false)}
+          dimensions={dimensions}
+          newActivityName={newActivityName}
+          setNewActivityName={setNewActivityName}
+          newActivityDimensions={newActivityDimensions}
+          onDimensionChange={handleNewActivityDimensionChange}
+          onSave={handleSaveActivity}
+        />
       )}
 
       {/* Taxonomy Modal */}
-      {expandedActivity && (() => {
-        // Separate dimensions into filtered and non-filtered
-        const filteredDims = DIMENSIONS.filter(dim => filters[dim.key] > 0);
-        const otherDims = DIMENSIONS.filter(dim => filters[dim.key] === 0);
-        
-        // Sort filtered dimensions by closest match (smallest difference)
-        const sortedFilteredDims = [...filteredDims].sort((a, b) => {
-          const diffA = Math.abs(getActivityValue(expandedActivity, a.key) - filters[a.key]);
-          const diffB = Math.abs(getActivityValue(expandedActivity, b.key) - filters[b.key]);
-          return diffA - diffB;
-        });
-
-        return (
-          <div className="modal-overlay" onClick={() => setExpandedActivity(null)}>
-            <div className="taxonomy-modal" onClick={(e) => e.stopPropagation()}>
-              <button className="modal-close" onClick={() => setExpandedActivity(null)}>
-                <X className="icon-small" />
-              </button>
-              <div className="taxonomy-header">
-                <h2 className="taxonomy-title">{expandedActivity.name}</h2>
-                <p className="taxonomy-subtitle">Dimensional Analysis (drag sliders to edit)</p>
-              </div>
-              
-              <div className="taxonomy-sections">
-                {/* Filtered Dimensions Section */}
-                {sortedFilteredDims.length > 0 && (
-                  <div className="taxonomy-section">
-                    <h3 className="taxonomy-section-title">Filtered Dimensions</h3>
-                    <p className="taxonomy-section-subtitle">Sorted by closest match to your filters</p>
-                    <div className="taxonomy-list">
-                      {sortedFilteredDims.map(dim => {
-                        const activityValue = getActivityValue(expandedActivity, dim.key);
-                        const diff = Math.abs(activityValue - filters[dim.key]);
-                        const isEdited = taxonomyEdits[expandedActivity.name]?.[dim.key] !== undefined;
-                        return (
-                          <div key={dim.key} className={`taxonomy-item filtered ${isEdited ? 'edited' : ''}`}>
-                            <div className="taxonomy-item-header">
-                              <span className="taxonomy-item-label">
-                                {dim.label}
-                                {isEdited && <span className="edited-badge">edited</span>}
-                              </span>
-                              <div className="taxonomy-item-values">
-                                <span className="taxonomy-item-filter">Filter: {filters[dim.key].toFixed(1)}</span>
-                                <span className="taxonomy-item-value">{activityValue.toFixed(1)}</span>
-                                <span className={`taxonomy-item-diff ${diff <= 1 ? 'close' : diff <= 2 ? 'medium' : 'far'}`}>
-                                  Δ {diff.toFixed(1)}
-                                </span>
-                              </div>
-                            </div>
-                            <input
-                              type="range"
-                              min="0"
-                              max="10"
-                              step="0.1"
-                              value={activityValue}
-                              onChange={(e) => handleTaxonomyEdit(expandedActivity.name, dim.key, e.target.value)}
-                              className="taxonomy-edit-slider"
-                            />
-                            <div className="taxonomy-bar-bg">
-                              <div 
-                                className="taxonomy-bar-fill" 
-                                style={{ width: `${activityValue * 10}%` }}
-                              />
-                              <div 
-                                className="taxonomy-bar-target" 
-                                style={{ left: `${filters[dim.key] * 10}%` }}
-                              />
-                            </div>
-                            <p className="taxonomy-item-desc">{dim.description}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Other Dimensions Section */}
-                {otherDims.length > 0 && (
-                  <div className="taxonomy-section">
-                    <h3 className="taxonomy-section-title">Other Dimensions</h3>
-                    <p className="taxonomy-section-subtitle">Not currently filtered</p>
-                    <div className="taxonomy-list">
-                      {otherDims.map(dim => {
-                        const activityValue = getActivityValue(expandedActivity, dim.key);
-                        const isEdited = taxonomyEdits[expandedActivity.name]?.[dim.key] !== undefined;
-                        return (
-                          <div key={dim.key} className={`taxonomy-item ${isEdited ? 'edited' : ''}`}>
-                            <div className="taxonomy-item-header">
-                              <span className="taxonomy-item-label">
-                                {dim.label}
-                                {isEdited && <span className="edited-badge">edited</span>}
-                              </span>
-                              <span className="taxonomy-item-value">{activityValue.toFixed(1)}</span>
-                            </div>
-                            <input
-                              type="range"
-                              min="0"
-                              max="10"
-                              step="0.1"
-                              value={activityValue}
-                              onChange={(e) => handleTaxonomyEdit(expandedActivity.name, dim.key, e.target.value)}
-                              className="taxonomy-edit-slider"
-                            />
-                            <div className="taxonomy-bar-bg">
-                              <div 
-                                className="taxonomy-bar-fill" 
-                                style={{ width: `${activityValue * 10}%` }}
-                              />
-                            </div>
-                            <p className="taxonomy-item-desc">{dim.description}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {expandedActivity && (
+        <TaxonomyModal
+          activity={expandedActivity}
+          dimensions={dimensions}
+          filters={filters}
+          taxonomyEdits={taxonomyEdits}
+          getActivityValue={getActivityValue}
+          onTaxonomyEdit={handleTaxonomyEdit}
+          onClose={() => setExpandedActivity(null)}
+        />
+      )}
 
       {/* Header */}
       <header className="app-header">
@@ -427,7 +292,7 @@ const App = () => {
           </div>
 
           <div className="dimension-list">
-            {DIMENSIONS.map((dim) => (
+            {dimensions.map((dim) => (
               <div 
                 key={dim.key} 
                 className={`dimension-item ${filters[dim.key] > 0 ? 'active' : ''}`}
@@ -439,7 +304,7 @@ const App = () => {
                     {dim.label}
                   </label>
                   <span className="dimension-value">
-                    {filters[dim.key].toFixed(1)}
+                    {(filters[dim.key] ?? 0).toFixed(1)}
                   </span>
                 </div>
                 <input
@@ -447,7 +312,7 @@ const App = () => {
                   min="0"
                   max="10"
                   step="0.1"
-                  value={filters[dim.key]}
+                  value={filters[dim.key] ?? 0}
                   onChange={(e) => handleSliderChange(dim.key, e.target.value)}
                   className="dimension-slider"
                 />
@@ -518,7 +383,7 @@ const App = () => {
                         <div className="metrics-grid">
                           {activeDimensionKeys.map(key => (
                             <div key={key} className="metric-item">
-                              <span className="metric-label">{DIMENSIONS.find(d => d.key === key)?.label || key}</span>
+                              <span className="metric-label">{dimensions.find(d => d.key === key)?.label || key}</span>
                               <div className="metric-bar-container">
                                 <div className="metric-bar-bg">
                                   <div 
@@ -550,22 +415,7 @@ const App = () => {
                 </div>
               </>
             ) : (
-              /* The INNOVATION ZONE alert */
-              <div className="innovation-zone">
-                <div className="innovation-icon-container">
-                  <AlertCircle className="innovation-icon" />
-                </div>
-                <h2 className="innovation-title">Entrance: The Innovation Zone</h2>
-                <p className="innovation-description">
-                  You have constructed a minute requirement for which <span className="highlight">no existing activity</span> is currently calibrated.
-                </p>
-                <div className="innovation-box">
-                  <p className="innovation-quote">"Notice you can find your fun anywhere, and it is a deeper, more reliable source of stability. You can create your own game inside a game."</p>
-                  <button className="create-activity-btn" onClick={openAddActivityModal}>
-                    Draft a New Activity for this State
-                  </button>
-                </div>
-              </div>
+              <InnovationZone onCreateActivity={openAddActivityModal} />
             )}
           </div>
         </main>
