@@ -1,0 +1,111 @@
+name,discovery_ease,feedback_clarity,repeatability,perspective,intuitiveness,planning,parallelism,skill_transfer
+Minecraft (Creative),8,6,7,1,9,5,7,4
+The Sims 4,7,7,7,3,8,4,5,2
+Elden Ring,4,7,6,3,3,7,2,3
+Stardew Valley,7,7,8,3,8,5,4,3
+Tetris,9,10,10,1,10,2,1,2
+Chess,5,9,10,3,6,10,1,8
+League of Legends,5,8,9,3,4,8,3,3
+Candy Crush,9,9,10,1,10,1,1,1
+Civilization VI,4,6,7,3,4,10,3,5
+Deep Meditation,9,4,10,1,9,2,1,9
+Walking in Nature,8,5,8,1,10,1,1,7
+Cooking (New Recipe),6,8,5,1,7,6,5,8
+Soccer (Football),6,9,9,1,8,6,4,7
+Oil Painting,6,6,6,1,5,6,2,7
+HIIT Workout,9,9,10,1,9,1,1,8
+Socializing (Party),7,6,4,1,8,2,6,6
+Monopoly,8,8,9,3,8,4,2,3
+Portal 2,4,9,5,1,4,8,1,4
+Call of Duty,6,9,9,1,7,5,3,3
+It Takes Two,6,9,5,3,7,5,4,3
+Hot Showering,10,8,10,1,10,1,1,2
+Commute Driving,8,7,10,1,9,3,3,9
+Lucid Dreaming,3,4,5,1,2,3,1,6
+Academic Studying,4,5,6,1,4,7,3,9
+Gardening,7,6,7,1,7,5,5,7
+Journaling,8,6,7,1,8,4,1,8
+Rocket League,6,10,9,3,7,5,2,3
+Animal Crossing,8,6,8,3,9,3,4,2
+Super Mario Odyssey,7,9,6,3,8,4,3,3
+Solo Dancing,8,7,8,1,8,2,4,6
+Reading a Book,6,5,7,1,8,2,1,8
+Watching TV,8,6,8,1,10,1,1,2
+Listening to Music,9,6,9,1,10,1,3,4
+Scrolling Social Media,8,6,9,1,10,1,2,1
+Taking a Nap,10,5,10,1,10,1,1,3
+Drinking Coffee,9,7,10,1,10,1,1,2
+Eating Breakfast,9,8,10,1,10,1,3,2
+Brushing Teeth,10,8,10,1,10,1,1,1
+Making the Bed,10,9,10,1,10,1,1,1
+Doing Laundry,9,7,10,1,9,2,2,3
+Washing Dishes,9,8,10,1,10,1,2,2
+Vacuuming,9,8,10,1,10,1,1,2
+Grocery Shopping,7,7,9,1,9,4,3,4
+Online Shopping,7,7,8,1,9,3,3,2
+Texting Friends,8,7,9,1,9,2,3,5
+Phone Calls,7,7,8,1,9,2,2,6
+Video Calls,7,8,7,1,9,2,2,6
+Checking Email,8,7,9,1,9,3,3,4
+Watching YouTube,8,6,8,1,10,1,2,3
+Listening to Podcasts,8,5,8,1,9,1,3,5
+Playing with Pets,8,8,9,1,9,1,4,3
+Walking the Dog,8,7,10,1,10,1,2,4
+Stretching,8,7,9,1,9,1,3,7
+Yoga,7,7,8,1,7,3,3,8
+Running,7,8,9,1,9,2,2,8
+Cycling,7,7,8,1,8,3,2,7
+Swimming,7,8,8,1,8,2,3,7
+Weight Lifting,7,8,9,1,8,4,2,8
+Rock Climbing,5,8,7,1,5,6,2,6
+Hiking,7,6,7,1,9,3,2,6
+Fishing,6,6,8,1,7,4,2,4
+Camping,6,6,5,1,7,5,4,5
+Photography,6,7,6,1,6,5,3,6
+Drawing,7,6,7,1,6,4,2,7
+Knitting,7,7,9,1,7,4,2,4
+Sewing,6,7,8,1,6,5,2,5
+Playing Piano,5,8,8,1,5,5,6,8
+Playing Guitar,5,8,8,1,5,5,5,8
+Singing,7,8,8,1,7,3,2,7
+Writing Poetry,6,5,6,1,6,5,1,7
+Creative Writing,6,5,6,1,6,6,1,7
+Blogging,7,6,7,1,7,5,2,5
+Learning a Language,4,6,8,1,4,5,2,9
+Watching Movies,8,7,5,1,9,1,1,3
+Binge-watching Series,8,6,6,1,9,1,1,2
+Board Games Night,6,8,8,3,7,6,2,4
+Card Games,7,8,9,3,8,5,2,4
+Jigsaw Puzzles,6,7,7,3,8,3,1,3
+Crossword Puzzles,5,7,8,1,6,5,1,4
+Sudoku,6,8,9,1,7,6,1,3
+Baking,6,8,6,1,7,6,4,7
+Grilling,7,8,7,1,8,4,4,5
+Meal Prep,7,7,8,1,8,5,5,6
+Coffee Brewing,7,8,8,1,8,4,2,4
+Wine Tasting,5,6,6,1,5,2,2,4
+Thrift Shopping,7,6,5,1,8,2,3,2
+Spa Day,8,7,6,1,9,1,2,3
+Massage,9,9,8,1,10,1,1,2
+Sunbathing,9,6,9,1,10,1,1,1
+Stargazing,7,4,7,1,8,1,1,4
+Bird Watching,6,5,7,1,7,2,1,4
+Attending Concerts,7,9,5,1,9,1,1,3
+Going to Museums,7,5,4,1,8,2,1,6
+Visiting Art Galleries,7,5,4,1,8,2,1,5
+Watching Live Sports,8,8,6,1,9,1,1,3
+Going to the Gym,7,8,9,1,8,4,3,8
+Taking a Bath,9,8,9,1,10,1,1,2
+Daydreaming,8,3,9,1,10,1,2,4
+DIY Projects,5,7,5,1,5,6,3,7
+Playing Darts,8,9,9,1,8,3,1,5
+Playing Pool,6,8,8,3,6,6,1,4
+Bowling,8,9,8,1,9,3,1,3
+Mini Golf,8,8,8,1,9,3,1,2
+Go Karting,7,9,7,1,8,4,2,4
+Escape Rooms,4,8,3,1,4,7,4,5
+Karaoke,8,8,7,1,8,2,1,4
+Trivia Night,6,8,7,1,7,4,1,5
+Volunteering,6,7,6,1,7,4,4,7
+Attending Workshops,5,7,5,1,6,4,2,8
+Networking Events,6,6,5,1,7,4,4,7

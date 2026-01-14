@@ -1,10 +1,10 @@
 /**
- * Seed script for Activity Architect
- * Run with: node scripts/seedData.js
+ * Reseed ONLY dimensions (not activities)
+ * Run with: node scripts/reseedDimensions.js
  */
 
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, doc, writeBatch } from 'firebase/firestore/lite';
+import { getFirestore, collection, doc, writeBatch, getDocs, deleteDoc } from 'firebase/firestore/lite';
 
 // Firebase config
 const firebaseConfig = {
@@ -119,66 +119,37 @@ const DIMENSIONS = [
   { key: 'actualization', label: 'Self-Actualization', description: 'Growth, meaning, and transcendence', category: 'maslow' }
 ];
 
-// ===================== ACTIVITIES DATA =====================
-// Import from separate file to keep this manageable
-import { ACTIVITIES } from './activitiesData.js';
-
-// ===================== SEED FUNCTIONS =====================
-
-async function seedDimensions() {
-  console.log('Seeding dimensions...');
-  const batch = writeBatch(db);
+async function reseedDimensions() {
+  console.log('🔄 Reseeding dimensions only...\n');
   
-  DIMENSIONS.forEach((dimension, index) => {
-    const docRef = doc(collection(db, 'dimensions'));
-    batch.set(docRef, { ...dimension, order: index });
-  });
-  
-  await batch.commit();
-  console.log(`✓ Seeded ${DIMENSIONS.length} dimensions`);
-}
-
-async function seedActivities() {
-  console.log('Seeding activities...');
-  const BATCH_SIZE = 450;
-  const chunks = [];
-  
-  for (let i = 0; i < ACTIVITIES.length; i += BATCH_SIZE) {
-    chunks.push(ACTIVITIES.slice(i, i + BATCH_SIZE));
-  }
-  
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
+  try {
+    // Step 1: Delete all existing dimensions
+    console.log('Deleting existing dimensions...');
+    const existingDocs = await getDocs(collection(db, 'dimensions'));
+    for (const docSnap of existingDocs.docs) {
+      await deleteDoc(doc(db, 'dimensions', docSnap.id));
+    }
+    console.log(`  ✓ Deleted ${existingDocs.size} existing dimensions`);
+    
+    // Step 2: Add new dimensions with correct order
+    console.log('Adding new dimensions...');
     const batch = writeBatch(db);
     
-    chunk.forEach((activity) => {
-      const docRef = doc(collection(db, 'activities'));
-      batch.set(docRef, {
-        ...activity,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
+    DIMENSIONS.forEach((dimension, index) => {
+      const docRef = doc(collection(db, 'dimensions'));
+      batch.set(docRef, { ...dimension, order: index });
     });
     
     await batch.commit();
-    console.log(`  Batch ${i + 1}/${chunks.length}: ${chunk.length} activities`);
-  }
-  
-  console.log(`✓ Seeded ${ACTIVITIES.length} activities total`);
-}
-
-async function main() {
-  console.log('🌱 Starting database seed...\n');
-  
-  try {
-    await seedDimensions();
-    await seedActivities();
-    console.log('\n✅ Seed complete!');
+    console.log(`  ✓ Added ${DIMENSIONS.length} dimensions with new order`);
+    
+    console.log('\n✅ Dimensions reseeded successfully!');
+    console.log('   Refresh your browser (Ctrl+Shift+R in Edge) to see the changes.');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Seed failed:', error);
+    console.error('❌ Reseed failed:', error);
     process.exit(1);
   }
 }
 
-main();
+reseedDimensions();
