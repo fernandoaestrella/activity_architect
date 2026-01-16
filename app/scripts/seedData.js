@@ -3,17 +3,18 @@
  * Run with: node scripts/seedData.js
  */
 
+import 'dotenv/config';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, doc, writeBatch } from 'firebase/firestore/lite';
 
-// Firebase config
+// Firebase config from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyBbyEBvRUfEYTbko-tg0-s1zXOkEeLgeB8",
-  authDomain: "activity-architect-1.firebaseapp.com",
-  projectId: "activity-architect-1",
-  storageBucket: "activity-architect-1.firebasestorage.app",
-  messagingSenderId: "397358438348",
-  appId: "1:397358438348:web:c324ebc6cc1dd3fe016f69"
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
